@@ -1,0 +1,38 @@
+version: 4.0.2.{build}
+
+branches:
+  except:
+    - gh-pages
+
+skip_tags: true
+
+cache:
+  - packages
+
+init:
+  - git config --global core.autocrlf input
+
+platform: Any CPU
+
+configuration: Release
+
+os: Visual Studio 2017
+
+before_build:
+  - dotnet --info
+  - dotnet restore src
+
+build:
+  parallel: true
+  project: src\Iesi.Collections.sln
+ 
+test_script:
+  - dotnet exec src\Iesi.Collections.Test\bin\Release\netcoreapp1.0\Iesi.Collections.Test.dll
+  - ps: .\Tools\uploadtests.ps1 .\TestResult.xml
+  - src\Iesi.Collections.Test\bin\Release\net40\Iesi.Collections.Test.exe
+  - ps: .\Tools\uploadtests.ps1 .\TestResult.xml
+  - src\Iesi.Collections.Test\bin\Release\net461\Iesi.Collections.Test.exe
+  - ps: .\Tools\uploadtests.ps1 .\TestResult.xml
+
+artifacts:
+  - path: '**\*.nupkg'
